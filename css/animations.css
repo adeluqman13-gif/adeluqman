@@ -1,0 +1,192 @@
+/* ==========================================================================
+   Animations — @keyframes + entrance utilities
+   Requirements: 10.1, 10.3, 10.4
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Base: elements with [data-animate] start hidden
+   -------------------------------------------------------------------------- */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--entrance-duration) var(--ease-out),
+              transform var(--entrance-duration) var(--ease-out);
+}
+
+/* .is-visible triggers the entrance — added by IntersectionObserver via JS */
+[data-animate].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fade-only variant */
+[data-animate="fade"] {
+  transform: none;
+  transition: opacity var(--entrance-duration) var(--ease-out);
+}
+
+/* Slide from left */
+[data-animate="slide-left"] {
+  transform: translateX(-32px);
+  transition: opacity var(--entrance-duration) var(--ease-out),
+              transform var(--entrance-duration) var(--ease-out);
+}
+[data-animate="slide-left"].is-visible { transform: translateX(0); }
+
+/* Slide from right */
+[data-animate="slide-right"] {
+  transform: translateX(32px);
+  transition: opacity var(--entrance-duration) var(--ease-out),
+              transform var(--entrance-duration) var(--ease-out);
+}
+[data-animate="slide-right"].is-visible { transform: translateX(0); }
+
+/* --------------------------------------------------------------------------
+   Stagger delays — nth-child selectors (Requirements 4.4, 5.4)
+   delay = n × BASE_STAGGER_MS (100ms)
+   -------------------------------------------------------------------------- */
+[data-stagger-index="0"]  { transition-delay: 0ms; }
+[data-stagger-index="1"]  { transition-delay: 100ms; }
+[data-stagger-index="2"]  { transition-delay: 200ms; }
+[data-stagger-index="3"]  { transition-delay: 300ms; }
+[data-stagger-index="4"]  { transition-delay: 400ms; }
+[data-stagger-index="5"]  { transition-delay: 500ms; }
+[data-stagger-index="6"]  { transition-delay: 600ms; }
+[data-stagger-index="7"]  { transition-delay: 700ms; }
+[data-stagger-index="8"]  { transition-delay: 800ms; }
+[data-stagger-index="9"]  { transition-delay: 900ms; }
+[data-stagger-index="10"] { transition-delay: 1000ms; }
+
+/* --------------------------------------------------------------------------
+   Named @keyframes
+   -------------------------------------------------------------------------- */
+
+/* Hero entrance — fade + slide-up, ≤ 800ms (Requirement 2.3) */
+@keyframes heroEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Fade in + slide up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in + slide down */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale in */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Pulse — subtle breathing effect */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+/* --------------------------------------------------------------------------
+   Hero animation classes (applied on DOMContentLoaded by main.js)
+   -------------------------------------------------------------------------- */
+.hero-animate {
+  animation: heroEntrance var(--entrance-duration-hero) var(--ease-out) both;
+}
+
+.hero-animate--delayed {
+  animation: heroEntrance var(--entrance-duration-hero) var(--ease-out) 200ms both;
+}
+
+/* --------------------------------------------------------------------------
+   Modal entrance
+   -------------------------------------------------------------------------- */
+.modal[data-animate-modal] {
+  animation: scaleIn var(--duration-base) var(--ease-out) both;
+}
+
+/* --------------------------------------------------------------------------
+   prefers-reduced-motion — disables ALL entrance transitions
+   Requirement 10.3
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  /* Remove all transitions on animated elements */
+  [data-animate],
+  [data-animate="fade"],
+  [data-animate="slide-left"],
+  [data-animate="slide-right"] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Remove stagger delays */
+  [data-stagger-index] {
+    transition-delay: 0ms !important;
+  }
+
+  /* Stop hero animations */
+  .hero-animate,
+  .hero-animate--delayed {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Suppress all CSS keyframe animations site-wide */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
